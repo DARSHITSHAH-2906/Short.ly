@@ -81,10 +81,10 @@ class App {
     async bootstrap() {
         await ConnecttoDB();
         this.app.use(cors({
-            origin: "http://localhost:3000",
+            origin: [process.env.FRONTEND_URL || "http://localhost:3000"],
             credentials: true,
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-            allowedHeaders: ['Content-Type', 'Authorization']
+            allowedHeaders: ['Content-Type']
         }));
         this.app.use(express.json())
         this.app.use(express.urlencoded({ extended: false }))
@@ -97,7 +97,7 @@ class App {
         this.app.use('/user', this.userRouter);
         this.app.use('/url/analytics', this.analyticsRouter);
 
-        this.app.listen(process.env.PORT || 8000, () => console.log(`Server started at ${process.env.PORT || 8000}`))
+        this.app.listen(process.env.PORT, () => console.log(`Server started at ${process.env.PORT}`))
     }
 }
 

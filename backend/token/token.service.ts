@@ -9,8 +9,8 @@ export class TokenService {
     private refreshSecret: string;
 
     constructor() {
-        this.accessSecret = process.env.JWT_ACCESS_SECRET || "default_access_secret";
-        this.refreshSecret = process.env.JWT_REFRESH_SECRET || "default_refresh_secret";
+        this.accessSecret = process.env.JWT_ACCESS_SECRET as string
+        this.refreshSecret = process.env.JWT_REFRESH_SECRET as string
     }
 
     generateTokens(user: IUser): CookieToken[] {

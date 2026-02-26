@@ -13,7 +13,7 @@ export interface CookieToken {
 export interface IPayload {
     sub: string;
     email: string;
-    subscriptionPlan: string; // Crucial for your URL feature gating!
+    subscriptionPlan: string;
 }
 
 export class TokenController {
@@ -22,8 +22,8 @@ export class TokenController {
     private refreshSecret: string;
 
     constructor(private readonly tokenService: TokenService) {
-        this.accessSecret = process.env.JWT_ACCESS_SECRET || "default_access_secret";
-        this.refreshSecret = process.env.JWT_REFRESH_SECRET || "default_refresh_secret";
+        this.accessSecret = process.env.JWT_ACCESS_SECRET as string
+        this.refreshSecret = process.env.JWT_REFRESH_SECRET as string;
         this.isProduction = process.env.NODE_ENV === 'production';
     }
 
@@ -35,8 +35,8 @@ export class TokenController {
             if (!access_token && !refresh_token) {
                 throw { code: HttpCodes.ALREADY_LOGOUT, message: "User is already logged out" }
             }
-            res.clearCookie('access_token', { httpOnly: true, secure: true, sameSite: "lax" });
-            res.clearCookie('refresh_token', { httpOnly: true, secure: true, sameSite: "lax" });
+            res.clearCookie('access_token', { httpOnly: true, secure: this.isProduction, sameSite: "lax" });
+            res.clearCookie('refresh_token', { httpOnly: true, secure: this.isProduction, sameSite: "lax" });
         } catch (error) {
             throw error;
         }
@@ -46,9 +46,8 @@ export class TokenController {
         for (const token of tokens) {
             res.cookie(token.name, token.value, {
                 httpOnly: true,
-                secure: this.isProduction, // True in production (HTTPS only)
+                secure: this.isProduction,
                 sameSite: "lax",
-                // Calculate maxAge dynamically based on token type
                 maxAge: token.name === "refresh_token" ? 7 * 24 * 60 * 60 * 1000 : 1 * 60 * 1000
             });
         }
@@ -65,8 +64,8 @@ export class TokenController {
             return payload;
 
         } catch (error) {
-            res.clearCookie('access_token');
-            res.clearCookie('refresh_token');
+            res.clearCookie('access_token', { httpOnly: true, secure: this.isProduction, sameSite: "lax" });
+            res.clearCookie('refresh_token', { httpOnly: true, secure: this.isProduction, sameSite: "lax" });
             return null;
         }
     }
