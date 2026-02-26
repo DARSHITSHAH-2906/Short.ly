@@ -9,15 +9,7 @@ import axios from 'axios';
 
 type Status = 'loading' | 'redirecting' | 'not_found' | 'paused' | 'error';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-interface UTMParams {
-    utm_source?: string;
-    utm_medium?: string;
-    utm_campaign?: string;
-    utm_term?: string;
-    utm_content?: string;
-}
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 export default function RedirectPage() {
     const { shortId } = useParams<{ shortId: string }>();
@@ -52,7 +44,7 @@ export default function RedirectPage() {
                 setStatus('error');
             }
         })
-        .finally()
+        .finally(() => {});
     }, [shortId]);
 
     useEffect(() => {

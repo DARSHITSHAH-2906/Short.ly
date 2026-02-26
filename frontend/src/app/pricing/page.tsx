@@ -113,10 +113,9 @@ export default function PricingPage() {
 
     return (
         <div className="w-full">
-            {/* ── Hero ── */}
             <section className="relative py-20 text-center px-6 dot-grid overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-[500px] h-[500px] rounded-full bg-primary/10 blur-[130px]" />
+                    <div className="w-125 h-125 rounded-full bg-primary/10 blur-[130px]" />
                 </div>
                 <div className="relative z-10 max-w-3xl mx-auto">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-semibold mb-6 tracking-wide uppercase">
@@ -214,7 +213,7 @@ export default function PricingPage() {
                                     {plan.missing.map((f) => (
                                         <li key={f} className="flex items-start gap-2.5 text-sm text-muted-foreground/50 line-through decoration-muted-foreground/30">
                                             <span className="h-4 w-4 shrink-0 mt-0.5 flex items-center justify-center">
-                                                <span className="h-[2px] w-3 bg-muted-foreground/30 rounded" />
+                                                <span className="h-0.5 w-3 bg-muted-foreground/30 rounded" />
                                             </span>
                                             <span>{f}</span>
                                         </li>
