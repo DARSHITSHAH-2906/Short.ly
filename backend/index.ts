@@ -81,7 +81,7 @@ class App {
     async bootstrap() {
         await ConnecttoDB();
         this.app.use(cors({
-            origin: [process.env.FRONTEND_URL || "http://localhost:3000"],
+            origin: [process.env.PRODUCTION_FRONTEND_URL as string, process.env.DEVELOPMENT_FRONTEND_URL as string],
             credentials: true,
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
             allowedHeaders: ['Content-Type']

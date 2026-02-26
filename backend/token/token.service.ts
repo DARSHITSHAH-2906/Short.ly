@@ -7,10 +7,14 @@ dotenv.config();
 export class TokenService {
     private accessSecret: string;
     private refreshSecret: string;
+    private ACCESS_TOKEN_EXPIRY: number;
+    private REFRESH_TOKEN_EXPIRY: number;
 
     constructor() {
         this.accessSecret = process.env.JWT_ACCESS_SECRET as string
         this.refreshSecret = process.env.JWT_REFRESH_SECRET as string
+        this.ACCESS_TOKEN_EXPIRY = parseInt(process.env.ACCESS_TOKEN_EXPIRY as string) || 15 * 60 * 1000;
+        this.REFRESH_TOKEN_EXPIRY = parseInt(process.env.REFRESH_TOKEN_EXPIRY as string) || 7 * 24 * 60 * 60 * 1000;
     }
 
     generateTokens(user: IUser): CookieToken[] {
@@ -20,8 +24,8 @@ export class TokenService {
             subscriptionPlan: user.subscriptionPlan || 'FREE'
         };
 
-        const accessToken = jwt.sign(payload, this.accessSecret, { expiresIn: "1m" });
-        const refreshToken = jwt.sign(payload, this.refreshSecret, { expiresIn: "7d" });
+        const accessToken = jwt.sign(payload, this.accessSecret, { expiresIn: `${this.ACCESS_TOKEN_EXPIRY/1000}s` });
+        const refreshToken = jwt.sign(payload, this.refreshSecret, { expiresIn: `${this.REFRESH_TOKEN_EXPIRY/1000}s` });
 
         return [
             { name: 'access_token', value: accessToken },
@@ -41,7 +45,7 @@ export class TokenService {
             subscriptionPlan: decoded.subscriptionPlan
         };
 
-        const newAccessToken = jwt.sign(payload, this.accessSecret, { expiresIn: "1m" });
+        const newAccessToken = jwt.sign(payload, this.accessSecret, { expiresIn: `${this.ACCESS_TOKEN_EXPIRY/1000}s` });
         const tokens : CookieToken[] = [{ name: "access_token", value: newAccessToken }]
         return { payload, tokens };
     }

@@ -22,7 +22,7 @@ import { Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
-const urlSchema = z.object({
+const getUrlSchema = (isEdit: boolean) => z.object({
   originalUrl: z.string().url({ message: 'Please enter a valid URL' }),
 
   customAlias: z.string()
@@ -37,7 +37,8 @@ const urlSchema = z.object({
     .or(z.literal(''))
     .refine((val) => {
       if (!val) return true;
-      return new Date(val) > new Date();
+      if (isEdit) return true;
+      return new Date(val) > new Date(Date.now() - 60000); // 1 min buffer
     }, { message: "Date must be in the future." }),
 
   activatesAt: z.string()
@@ -45,7 +46,8 @@ const urlSchema = z.object({
     .or(z.literal(''))
     .refine((val) => {
       if (!val) return true;
-      return new Date(val) > new Date();
+      if (isEdit) return true; // The Fix: Allow past dates (like createdAt) when editing
+      return new Date(val) > new Date(Date.now() - 60000); // 1 min buffer
     }, { message: "Date must be in the future." }),
 
   password: z.string()
@@ -57,9 +59,11 @@ const urlSchema = z.object({
     ios: z.string().url({ message: 'Invalid iOS URL' }).optional().or(z.literal('')),
     android: z.string().url({ message: 'Invalid Android URL' }).optional().or(z.literal('')),
   }).optional(),
+
+  createdAt: z.string().optional(),
 });
 
-export type UrlFormValues = z.infer<typeof urlSchema>;
+export type UrlFormValues = z.infer<ReturnType<typeof getUrlSchema>>;
 
 interface UrlFormProps {
   initialData?: UrlFormValues & { shortId?: string };
@@ -71,9 +75,10 @@ export function UrlForm({ initialData, onSuccess }: UrlFormProps) {
   const isPremium = !(user?.subscriptionPlan === "FREE");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter()
+  const isEdit = Boolean(initialData?.shortId);
 
   const form = useForm<UrlFormValues>({
-    resolver: zodResolver(urlSchema),
+    resolver: zodResolver(getUrlSchema(isEdit)),
     defaultValues: {
       originalUrl: initialData?.originalUrl || '',
       customAlias: initialData?.customAlias || '',
@@ -82,7 +87,9 @@ export function UrlForm({ initialData, onSuccess }: UrlFormProps) {
         : '',
       activatesAt: initialData?.activatesAt
         ? new Date(initialData.activatesAt).toISOString().slice(0, 16)
-        : '',
+        : initialData?.createdAt
+          ? new Date(initialData.createdAt).toISOString().slice(0, 16)
+          : '',
       password: initialData?.password || '',
       deviceUrls: {
         ios: initialData?.deviceUrls?.ios || '',

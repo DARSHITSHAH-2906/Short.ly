@@ -20,11 +20,15 @@ export class TokenController {
     private isProduction: boolean;
     private accessSecret: string;
     private refreshSecret: string;
+    private ACCESS_TOKEN_EXPIRY: number;
+    private REFRESH_TOKEN_EXPIRY: number;
 
     constructor(private readonly tokenService: TokenService) {
         this.accessSecret = process.env.JWT_ACCESS_SECRET as string
         this.refreshSecret = process.env.JWT_REFRESH_SECRET as string;
         this.isProduction = process.env.NODE_ENV === 'production';
+        this.ACCESS_TOKEN_EXPIRY = parseInt(process.env.ACCESS_TOKEN_EXPIRY as string) || 15 * 60 * 1000; // default 15 minutes
+        this.REFRESH_TOKEN_EXPIRY = parseInt(process.env.REFRESH_TOKEN_EXPIRY as string) || 7 * 24 * 60 * 60 * 1000; // default 7 days
     }
 
     async removeTokens(req: Request, res: Response) {
@@ -48,7 +52,7 @@ export class TokenController {
                 httpOnly: true,
                 secure: this.isProduction,
                 sameSite: "lax",
-                maxAge: token.name === "refresh_token" ? 7 * 24 * 60 * 60 * 1000 : 1 * 60 * 1000
+                maxAge: token.name === "refresh_token" ? this.REFRESH_TOKEN_EXPIRY : this.ACCESS_TOKEN_EXPIRY
             });
         }
     }

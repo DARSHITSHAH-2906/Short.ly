@@ -86,4 +86,12 @@ export class UserService {
         user.availableCredits -= 1;
         await user.save();
     }
+
+    async getSubscriptionPlan(userId: mongoose.Types.ObjectId) {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw { code: HttpCodes.USER_NOT_FOUND, message: "User Not Found" }
+        }
+        return user.subscriptionPlan || 'FREE';
+    }
 }

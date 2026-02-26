@@ -69,7 +69,9 @@ api.interceptors.response.use(
         useAuthStore.getState().logout();
         if (typeof window !== 'undefined') {
           const pathname = window.location.pathname;
-          if(!pathname.startsWith('/url')){
+          const isAuthOrPublicPage = pathname === '/login' || pathname === '/signup' || pathname === '/';
+          const isShortLinkRedirect = pathname.startsWith('/url');
+          if(!isAuthOrPublicPage && !isShortLinkRedirect) {
             window.location.href = '/login';
           }
         }

@@ -126,5 +126,18 @@ export class UrlService {
         return await Url.findOne({ shortId, userId: new mongoose.Types.ObjectId(userId) });
     }
 
+    async incrementClickCount(shortId: string): Promise<void> {
+        try{
+            await Url.findOneAndUpdate({ shortId }, { $inc: { totalClicks: 1 } });
+        }catch(error: any){
+            if(error.code === HttpCodes.URL_NOT_FOUND) {
+                throw {code : HttpCodes.URL_NOT_FOUND, message: "URL not found"};
+            }
+            throw error;
+        }
+
+    }
+
+
 
 }

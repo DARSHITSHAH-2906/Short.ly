@@ -66,20 +66,24 @@ export class UrlController {
             const user = req.user as any;
             const userId = user.sub;
             const userPlan = user.subscriptionPlan || 'FREE';
+            const updatePayload: Record<string,string> = {}
+            const {originalUrl, customAlias } = req.body;
+            if(originalUrl) updatePayload['originalUrl'] = originalUrl;
+            if(customAlias) updatePayload['customAlias'] = customAlias;
 
-            const {
-                customAlias, expiresAt, password, isActive, deviceUrls,
-                 activatesAt
-            } = req.body;
+            const {expiresAt, password, isActive, deviceUrls,activatesAt } = req.body;
+            const hasPremiumFeatures = expiresAt || password || deviceUrls?.ios || deviceUrls?.android || activatesAt;
 
             const isPremiumUser = ['PRO', 'ENTERPRISE'].includes(userPlan);
-            if (!isPremiumUser) {
-                return res.status(HttpCodes.FORBIDDEN).json({ status: "error", message: "Premium plan required to modify link features." });
+            if (isPremiumUser && hasPremiumFeatures) {
+                if (expiresAt) updatePayload['expiresAt'] = expiresAt;
+                if (password) updatePayload['password'] = password;
+                if (deviceUrls) updatePayload['deviceUrls'] = deviceUrls;
+                if (activatesAt) updatePayload['activatesAt'] = activatesAt;
+                if (isActive !== undefined) updatePayload['isActive'] = isActive;
             }
 
-            await this.urlService.updateShortUrl(shortId, userId, {
-                customAlias, expiresAt, password, isActive, deviceUrls, activatesAt
-            });
+            await this.urlService.updateShortUrl(shortId, userId, updatePayload);
 
             return res.status(HttpCodes.URL_UPDATED).json({
                 status: "success",
@@ -124,17 +128,25 @@ export class UrlController {
             if (urlDoc.isActive === false) {
                 return res.status(HttpCodes.URL_INACTIVE).send('This URL is currently paused. Please try again later.');
             }
-
             const destinationUrl = new URL(urlDoc.originalUrl);
+            await this.urlService.incrementClickCount(shortId);
 
-            for (const [key, value] of Object.entries(req.query)) {
-                if (typeof value === 'string') {
-                    destinationUrl.searchParams.set(key, value);
+            const ownerSusbcriptionPlan = await this.userService.getSubscriptionPlan(urlDoc.userId);
+
+            if(ownerSusbcriptionPlan !== 'FREE') {
+                for (const [key, value] of Object.entries(req.query)) {
+                    if (typeof value === 'string') {
+                        destinationUrl.searchParams.set(key, value);
+                    }
                 }
             }
-            const analyticsPayload = this.analyticsService.extractClickData(req, res, urlDoc.shortId, destinationUrl);
+            let analyticsPayload;
+            if(ownerSusbcriptionPlan !== 'FREE'){
+                analyticsPayload = this.analyticsService.extractClickData(req, res, urlDoc.shortId, destinationUrl);
+            }
 
             res.redirect(HttpCodes.REDIRECT, destinationUrl.toString());
+
             // analyticsQueue.add('process-click', analyticsPayload);
             this.analyticsService.saveClickData(analyticsPayload)
                 .catch(err => {

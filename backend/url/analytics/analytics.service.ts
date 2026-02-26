@@ -183,6 +183,9 @@ export class AnalyticsService {
 
     async saveClickData(payload: any): Promise<void> {
         try {
+            if(!payload || !payload.shortId) {
+                return;
+            }
             const urlDoc = await Url.findOne({ shortId: payload.shortId });
             if (!urlDoc) return;
 
@@ -191,9 +194,6 @@ export class AnalyticsService {
                 urlId: urlDoc._id
             });
             await newClick.save();
-
-            await Url.findByIdAndUpdate(urlDoc._id, { $inc: { totalClicks: 1 } });
-
         } catch (error) {
             throw error;
         }
