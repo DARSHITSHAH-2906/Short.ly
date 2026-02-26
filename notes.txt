@@ -1,0 +1,2 @@
+adding shadcn component : npx shadcn@latest add dialog
+init shadcn : npx shadcn@latest init

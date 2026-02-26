@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shorten Url</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <% if(locals.id!=""){ %>
+        <form action="/user/logout" method="post">
+            <button id="logoutbtn" type="submit">Log out</button>
+        </form>
+    <% } %>
+    <% if(locals.id==""){ %>
+        <form action="/login" method="get">
+            <button id="loginbtn" type="submit">Log in</button>
+        </form>
+    <% } %>
+
+    <h1 id="title">URL SHORTNER</h1>
+    <% if (locals.id) { %>
+        <p>URL Generated : https://shorten-url-v083.onrender.com/url/<%= id %></p>
+    <% } %>
+
+    <% if (locals.deletedid) { %>
+        <p> <%= deletedid %> ID Deleted Sucessfully</p>
+    <% } %>
+
+    <form class="form1" action="/url" method="post" >
+        <label id="label1">Enter the url:</label>
+        <input id="inputtext",
+        type="text" , name="url" , placeholder="https://example.com" >
+        <button id="submitbtn" type="submit">Generate</button>
+    </form>
+
+    
+    <% if (locals.urls) { %>
+     <table>
+        <thead>
+            <th>Sr.no</th>
+            <th>Short URL</th>
+            <th>Redirecting Url</th>
+            <th>Visited</th>
+            <th>Delete</th>
+            <th>Analytics</th>
+        </thead>
+        <tbody>
+            <% urls.forEach((url,index) => { %>
+             <tr>
+                <td><%= index+1  %></td>
+                <td><a href="https://shorten-url-v083.onrender.com/url/<%= url.shortenurl %>" target="_blank">short-url/<%= url.shortenurl %></a></td>
+                <td><%= url.redirecturl %></td>
+                <td><%= url.visitcount %></td>
+                <td>
+                    <form action="/url/<%= url.shortenurl %>" method="POST" >
+                        <button type="submit" class="delandanalytics">Delete</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/url/analytics/<%= url.shortenurl %>" method="get" >
+                        <button type="submit" class="delandanalytics">Analytics</button>
+                    </form>
+                </td>
+             </tr>
+            <% }) %>
+        </tbody>
+     </table>
+    <% } %>
+</body>
+</html>
