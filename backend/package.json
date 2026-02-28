@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon --exec node --loader ts-node/esm index.ts",
-    "build": "npm i --include=dev && tsc"
+    "build": "tsc",
+    "prod": "npm i --include=dev && tsc"
   },
   "author": "",
   "license": "ISC",

@@ -66,12 +66,14 @@ export class UrlController {
             const user = req.user as any;
             const userId = user.sub;
             const userPlan = user.subscriptionPlan || 'FREE';
-            const updatePayload: Record<string,string> = {}
-            const {originalUrl } = req.body;
+            const updatePayload: Record<string,any> = {}
+            const {originalUrl , isActive} = req.body;
             if(originalUrl) updatePayload['originalUrl'] = originalUrl;
+            if (isActive!==undefined || isActive!==null) updatePayload['isActive'] = isActive;
+
             
-            const {customAlias, expiresAt, password, isActive, deviceUrls,activatesAt } = req.body;
-            const hasPremiumFeatures = expiresAt || password || deviceUrls?.ios || deviceUrls?.android || activatesAt;
+            const {customAlias, expiresAt, password, deviceUrls,activatesAt } = req.body;
+            const hasPremiumFeatures = customAlias || expiresAt || password || deviceUrls?.ios || deviceUrls?.android || activatesAt;
             
             const isPremiumUser = ['PRO', 'ENTERPRISE'].includes(userPlan);
             if (isPremiumUser && hasPremiumFeatures) {
@@ -79,10 +81,8 @@ export class UrlController {
                 if (password) updatePayload['password'] = password;
                 if (deviceUrls) updatePayload['deviceUrls'] = deviceUrls;
                 if (activatesAt) updatePayload['activatesAt'] = activatesAt;
-                if (isActive !== undefined) updatePayload['isActive'] = isActive;
                 if(customAlias) updatePayload['customAlias'] = customAlias;
             }
-
             await this.urlService.updateShortUrl(shortId, userId, updatePayload);
 
             return res.status(HttpCodes.URL_UPDATED).json({
