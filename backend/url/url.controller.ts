@@ -67,13 +67,12 @@ export class UrlController {
             const userId = user.sub;
             const userPlan = user.subscriptionPlan || 'FREE';
             const updatePayload: Record<string,string> = {}
-            const {originalUrl, customAlias } = req.body;
+            const {originalUrl } = req.body;
             if(originalUrl) updatePayload['originalUrl'] = originalUrl;
-            if(customAlias) updatePayload['customAlias'] = customAlias;
-
-            const {expiresAt, password, isActive, deviceUrls,activatesAt } = req.body;
+            
+            const {customAlias, expiresAt, password, isActive, deviceUrls,activatesAt } = req.body;
             const hasPremiumFeatures = expiresAt || password || deviceUrls?.ios || deviceUrls?.android || activatesAt;
-
+            
             const isPremiumUser = ['PRO', 'ENTERPRISE'].includes(userPlan);
             if (isPremiumUser && hasPremiumFeatures) {
                 if (expiresAt) updatePayload['expiresAt'] = expiresAt;
@@ -81,6 +80,7 @@ export class UrlController {
                 if (deviceUrls) updatePayload['deviceUrls'] = deviceUrls;
                 if (activatesAt) updatePayload['activatesAt'] = activatesAt;
                 if (isActive !== undefined) updatePayload['isActive'] = isActive;
+                if(customAlias) updatePayload['customAlias'] = customAlias;
             }
 
             await this.urlService.updateShortUrl(shortId, userId, updatePayload);

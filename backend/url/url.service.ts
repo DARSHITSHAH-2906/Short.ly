@@ -85,6 +85,8 @@ export class UrlService {
             throw {code : HttpCodes.URL_NOT_FOUND, message: "URL not found"};
         }
 
+        if(updateData.originalUrl) existingUrl.originalUrl = updateData.originalUrl;
+
         if (updateData.password) {
             existingUrl.passwordHash = await bcrypt.hash(updateData.password, 10);
         } else if (updateData.password === "") {
