@@ -15,7 +15,7 @@ interface AuthState {
     user: User | null;
     isAuthenticated: boolean;
     lastVerifiedAt: number | null;
-    setUser: () => void;
+    setUser: (user : User) => void;
     logout: () => Promise<void>;
     initializeAuth: () => Promise<void>;
 }
@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             lastVerifiedAt: null,
-            setUser: () => set(get()),
+            setUser: (user: User) => set({ user, isAuthenticated: true, lastVerifiedAt: Date.now() }),
             logout: async () => {
                 try {
                     await api.get('/auth/logout');
