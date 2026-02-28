@@ -91,6 +91,11 @@ class App {
         this.app.use(cookieparser())
         this.app.use(express.static(path.resolve('./public')))
 
+        //health check
+        this.app.get('/health', (req, res) => {
+            res.status(200).json({ status: "ok", health: `${new Date(Date.now())}` });
+        })
+
         //routes
         this.app.use('/auth', this.authRouter);
         this.app.use('/url', this.urlRouter);

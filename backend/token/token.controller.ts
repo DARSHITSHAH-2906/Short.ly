@@ -39,8 +39,8 @@ export class TokenController {
             if (!access_token && !refresh_token) {
                 throw { code: HttpCodes.ALREADY_LOGOUT, message: "User is already logged out" }
             }
-            res.clearCookie('access_token', { httpOnly: true, secure: this.isProduction, sameSite: "lax" });
-            res.clearCookie('refresh_token', { httpOnly: true, secure: this.isProduction, sameSite: "lax" });
+            res.clearCookie('access_token', { httpOnly: true, secure: this.isProduction, sameSite: this.isProduction ? "none" : "lax" });
+            res.clearCookie('refresh_token', { httpOnly: true, secure: this.isProduction, sameSite: this.isProduction ? "none" : "lax" });
         } catch (error) {
             throw error;
         }
@@ -51,7 +51,7 @@ export class TokenController {
             res.cookie(token.name, token.value, {
                 httpOnly: true,
                 secure: this.isProduction,
-                sameSite: "lax",
+                sameSite: this.isProduction ? "none" : "lax",
                 maxAge: token.name === "refresh_token" ? this.REFRESH_TOKEN_EXPIRY : this.ACCESS_TOKEN_EXPIRY
             });
         }
@@ -68,8 +68,8 @@ export class TokenController {
             return payload;
 
         } catch (error) {
-            res.clearCookie('access_token', { httpOnly: true, secure: this.isProduction, sameSite: "lax" });
-            res.clearCookie('refresh_token', { httpOnly: true, secure: this.isProduction, sameSite: "lax" });
+            res.clearCookie('access_token', { httpOnly: true, secure: this.isProduction, sameSite: this.isProduction ? "none" : "lax" });
+            res.clearCookie('refresh_token', { httpOnly: true, secure: this.isProduction, sameSite: this.isProduction ? "none" : "lax" });
             return null;
         }
     }
