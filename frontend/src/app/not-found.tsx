@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Link2Off, Home, LayoutDashboard } from 'lucide-react';
 
 export default function NotFound() {
@@ -30,18 +30,20 @@ export default function NotFound() {
 
       {/* Call to Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm justify-center">
-        <Button asChild variant="default" className="w-full sm:w-auto flex items-center gap-2">
-          <Link href="/">
-            <Home className="w-4 h-4" />
-            Back to Home
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="w-full sm:w-auto flex items-center gap-2">
-          <Link href="/dashboard">
-            <LayoutDashboard className="w-4 h-4" />
-            Go to Dashboard
-          </Link>
-        </Button>
+        <Link 
+          href="/" 
+          className={buttonVariants({ variant: "default", className: "w-full sm:w-auto flex items-center gap-2" })}
+        >
+          <Home className="w-4 h-4" />
+          Back to Home
+        </Link>
+        <Link 
+          href="/dashboard" 
+          className={buttonVariants({ variant: "outline", className: "w-full sm:w-auto flex items-center gap-2" })}
+        >
+          <LayoutDashboard className="w-4 h-4" />
+          Go to Dashboard
+        </Link>
       </div>
       
     </div>
