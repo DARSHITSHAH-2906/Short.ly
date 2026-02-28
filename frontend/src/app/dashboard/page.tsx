@@ -14,8 +14,8 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { 
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription 
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
@@ -40,18 +40,18 @@ export default function Dashboard() {
   const user = useAuthStore((state) => state.user);
   const isPremium = user?.subscriptionPlan !== 'FREE';
 
-  useEffect(() => { fetchUrls(); }, []);
-
-  const fetchUrls = async () => {
-    try {
-      const response = await api.get('/user/urls');
-      setUrls(Array.isArray(response.data) ? response.data : response.data.urls ?? []);
-    } catch {
-      toast.error('Failed to load URLs');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    api.get('/user/urls')
+      .then((res) => {
+        setUrls(res.data.urls || []);
+      })
+      .catch(err => {
+        toast.error(err.response?.data?.message || 'Failed to load URLs');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      })
+  }, [])
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
