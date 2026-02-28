@@ -1,5 +1,5 @@
 {
-  "name": "Short.ly",
+  "name": "short.ly",
   "version": "1.0.0",
   "description": "\"Project of shorten url\"",
   "main": "index.ts",
@@ -8,7 +8,7 @@
     "start": "ts-node index.ts",
     "dev": "nodemon --exec node --loader ts-node/esm index.ts",
     "build": "tsc",
-    "prod" : "pnpm run build && node dist/index.js"
+    "prod" : "node dist/index.js"
   },
   "author": "",
   "license": "ISC",
